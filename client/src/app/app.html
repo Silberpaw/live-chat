@@ -1,0 +1,59 @@
+<div class="chat-container">
+  <header class="chat-header">
+    <div class="chat-logo">💬</div>
+
+    <div>
+      <h1>Live Chat</h1>
+      <p>Unser erster Echtzeit-Chat</p>
+    </div>
+
+    <span class="status">
+      {{ connected ? '● Verbunden' : '● Verbindung wird hergestellt ...' }}
+    </span>
+  </header>
+    <div class="username-input">
+      <label for="username">Dein Benutzername</label>
+      <input
+        id="username"
+        type="text"
+        name="username"
+        [(ngModel)]="username"
+        placeholder="z. B. Alex"
+        maxlength="30"
+        autocomplete="nickname"
+      />
+    </div>
+
+  <main class="chat-messages">
+    @if (messages.length === 0) {
+      <div class="welcome-message">
+        <span>👋</span>
+        <h2>Willkommen im Chat!</h2>
+        <p>Schreib deine erste Nachricht.</p>
+      </div>
+    }
+    @for (message of messages; track $index) {
+
+      <div class="message">
+        <strong class="message-username">{{ message.username }}</strong>
+        <p>{{ message.text }}</p>
+        <small>{{ message.time }}</small>
+      </div>
+    }
+
+  </main>
+
+  <form class="chat-input" (submit)="$event.preventDefault(); sendMessage()">
+    <input
+      type="text"
+      name="message"
+      [(ngModel)]="messageText"
+      placeholder="Nachricht schreiben..."
+      aria-label="Nachricht schreiben"
+      autocomplete="off"
+    />
+
+    <button type="submit" [disabled]="!connected || !username.trim() || !messageText.trim()">      Senden ➤
+    </button>
+  </form>
+</div>
