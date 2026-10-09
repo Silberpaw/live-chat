@@ -1,10 +1,10 @@
 <div class="chat-container">
   <header class="chat-header">
-    <div class="chat-logo">💬</div>
+    <div class="chat-logo">💌</div>
 
     <div>
       <h1>Live Chat</h1>
-      <p>Unser erster Echtzeit-Chat</p>
+      <p>Chatten Sie mit Ihren Freunden</p>
     </div>
 
     <span class="status">
@@ -13,40 +13,79 @@
   </header>
     <div class="username-input">
       <label for="username">Dein Benutzername</label>
+      
       <input
         id="username"
         type="text"
         name="username"
         [(ngModel)]="username"
+        (ngModelChange)="onUsernameChange()"
         placeholder="z. B. Alex"
         maxlength="30"
         autocomplete="nickname"
       />
     </div>
 
+      <section class="online-panel">
+        <h3>🟢 Online <span>{{ onlineUsers.length }}</span></h3>
+
+        @if (onlineUsers.length === 0) {
+          <p class="no-users">Noch niemand online</p>
+        }
+
+        <div class="online-users">
+          @for (user of onlineUsers; track user.id) {
+            <div class="online-user">
+              <span class="online-dot"></span>
+              <span>{{ user.username }}</span>
+            </div>
+          }
+        </div>
+      </section>
   <main class="chat-messages">
+    
     @if (messages.length === 0) {
       <div class="welcome-message">
-        <span>👋</span>
-        <h2>Willkommen im Chat!</h2>
+        <h2>Moin! Willkommen im Chat!</h2>
         <p>Schreib deine erste Nachricht.</p>
       </div>
     }
     @for (message of messages; track $index) {
 
-      <div class="message">
-        <strong class="message-username">{{ message.username }}</strong>
-        <p>{{ message.text }}</p>
-        <small>{{ message.time }}</small>
+        
+      <div
+        class="message-row"
+        [class.own-row]="message.username === username.trim()"
+      >
+        <div class="avatar">
+          {{ (message.username || '?').charAt(0).toUpperCase() }}
+        </div>
+
+        <div
+          class="message"
+          [class.own-message]="message.username === username.trim()"
+        >
+          <strong class="message-username">{{ message.username }}</strong>
+          <p>{{ message.text }}</p>
+          <small>{{ message.time }}</small>
+        </div>
       </div>
     }
 
   </main>
-
+  <div class="typing-indicator" aria-live="polite">
+    @if (typingUsers.length === 1) {
+      <span>{{ typingUsers[0] }} schreibt gerade …</span>
+    } @else if (typingUsers.length > 1) {
+      <span>Mehrere Personen schreiben gerade …</span>
+    }
+  </div>
   <form class="chat-input" (submit)="$event.preventDefault(); sendMessage()">
     <input
       type="text"
       name="message"
+      (input)="onMessageInput()"
+      (blur)="stopTyping()"
       [(ngModel)]="messageText"
       placeholder="Nachricht schreiben..."
       aria-label="Nachricht schreiben"
